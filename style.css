@@ -1,0 +1,228 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Courier New', monospace;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    color: #fff;
+    overflow: hidden;
+}
+
+#game-container {
+    position: relative;
+    background: #1a1a2e;
+    border: 4px solid #fff;
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+}
+
+/* Title Screen */
+#title-screen {
+    width: 800px;
+    height: 600px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(180deg, #2d3561 0%, #1a1a2e 100%);
+    padding: 40px;
+}
+
+#title-screen h1 {
+    font-size: 64px;
+    margin-bottom: 10px;
+    text-shadow: 4px 4px 0px #000;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.subtitle {
+    font-size: 20px;
+    margin-bottom: 40px;
+    color: #ffd700;
+    text-shadow: 2px 2px 0px #000;
+}
+
+#start-btn {
+    font-family: 'Courier New', monospace;
+    font-size: 24px;
+    font-weight: bold;
+    padding: 15px 40px;
+    background: #ffd700;
+    color: #1a1a2e;
+    border: 4px solid #fff;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-shadow: none;
+    box-shadow: 0 4px 0 #cc9900;
+}
+
+#start-btn:hover {
+    background: #ffed4e;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 #cc9900;
+}
+
+#start-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #cc9900;
+}
+
+.controls-info {
+    margin-top: 40px;
+    text-align: center;
+    opacity: 0.8;
+}
+
+.controls-info p {
+    margin: 8px 0;
+    font-size: 14px;
+}
+
+/* Game Screen */
+#game-screen {
+    position: relative;
+    width: 800px;
+    height: 600px;
+}
+
+#game-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    background: #16213e;
+}
+
+/* UI Overlay */
+#ui-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 10px;
+    pointer-events: none;
+}
+
+.player-info {
+    background: rgba(0, 0, 0, 0.7);
+    padding: 8px 15px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    border: 2px solid #ffd700;
+}
+
+#player-name {
+    font-weight: bold;
+    color: #ffd700;
+}
+
+#location-info {
+    color: #fff;
+}
+
+/* Dialogue Box */
+#dialogue-box {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.9);
+    border-top: 4px solid #ffd700;
+    padding: 20px;
+    transition: transform 0.3s ease;
+}
+
+#dialogue-box.dialogue-hidden {
+    transform: translateY(100%);
+}
+
+.dialogue-content {
+    position: relative;
+}
+
+.speaker-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: #ffd700;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.dialogue-text {
+    font-size: 18px;
+    line-height: 1.6;
+    margin-bottom: 10px;
+    min-height: 60px;
+    color: #fff;
+}
+
+.dialogue-continue {
+    text-align: right;
+    font-size: 12px;
+    color: #aaa;
+    animation: blink 1.5s ease-in-out infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+.dialogue-choices {
+    margin-top: 15px;
+    display: none;
+}
+
+.dialogue-choices.active {
+    display: block;
+}
+
+.choice-btn {
+    display: block;
+    width: 100%;
+    padding: 12px 15px;
+    margin: 8px 0;
+    background: #2d3561;
+    color: #fff;
+    border: 2px solid #ffd700;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 16px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+}
+
+.choice-btn:hover {
+    background: #3d4571;
+    transform: translateX(5px);
+}
+
+.choice-btn:before {
+    content: '▶ ';
+    color: #ffd700;
+}
+
+/* Pixel Art Effects */
+.pixel {
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+}
