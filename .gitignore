@@ -28,3 +28,34 @@ yarn-error.log*
 node_modules/
 dist/
 *.tsbuildinfo
+
+# Python (not part of this project)
+venv/
+pyvenv.cfg
+*.pyc
+__pycache__/
+*.py
+
+# Project docs and scripts (not part of core game)
+DOCKER_QUICKSTART.md
+INSTALL_PYTHON310.md
+PROJECT_STRUCTURE.md
+QUICKSTART.md
+QUICK_SETUP.md
+README_TRAINING.md
+RUN_AS_OS.md
+SIMPLE_START.md
+START_HERE.md
+TROUBLESHOOTING.md
+*.sh
+requirements*.txt
+
+# Unrelated project directories
+aclos/
+bible/
+bin/
+boot_minimal.sh
+docker_os/
+lib/
+llm/
+renderer/
