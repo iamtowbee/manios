@@ -18,7 +18,10 @@
 ## 🚀 Quick Start
 
 ```typescript
-import { Box, Text, Button, DialogueBox } from '@curds/tangui';
+import { init, Box, Text, Button, DialogueBox } from '@curds/tangui';
+
+// Initialize TanGui (call once at app start)
+init();
 
 // Create a simple UI
 const container = new Box({
@@ -33,7 +36,14 @@ const text = new Text({
   color: 'primary'
 });
 
+const button = new Button({
+  children: 'Click Me!',
+  variant: 'primary',
+  onClick: () => console.log('Button clicked!')
+});
+
 container.appendChild(text);
+container.appendChild(button);
 container.appendTo(document.body);
 ```
 
@@ -176,9 +186,140 @@ animate(element, {
 });
 ```
 
+## 📖 Examples
+
+### Creating a Dialogue System
+
+```typescript
+import { DialogueBox } from '@curds/tangui/game';
+
+const dialogue = new DialogueBox({
+  lines: [
+    {
+      speaker: 'Cheese Master',
+      text: 'Welcome to the village!',
+    },
+    {
+      speaker: 'Cheese Master',
+      text: 'What brings you here?',
+      choices: [
+        {
+          text: 'I seek adventure!',
+          action: () => console.log('Adventure chosen')
+        },
+        {
+          text: 'Just exploring.',
+          action: () => console.log('Exploring')
+        }
+      ]
+    }
+  ],
+  typewriterSpeed: 30,
+  onComplete: () => console.log('Dialogue finished')
+});
+
+dialogue.appendTo(document.body);
+dialogue.show();
+```
+
+### Creating a HUD
+
+```typescript
+import { HUD } from '@curds/tangui/game';
+
+const hud = new HUD({
+  playerName: 'Hero',
+  health: 100,
+  maxHealth: 100,
+  mana: 50,
+  maxMana: 100,
+  level: 5,
+  score: 1234,
+  gold: 567
+});
+
+hud.appendTo(document.body);
+
+// Update stats
+hud.updateStats({
+  health: 75,
+  score: 1500
+});
+
+// Animate health change
+hud.animateHealthChange(75, 100, 1000);
+```
+
+### Creating a Menu
+
+```typescript
+import { Menu } from '@curds/tangui/game';
+
+const menu = new Menu({
+  title: 'Main Menu',
+  items: [
+    {
+      label: 'Start Game',
+      icon: '▶',
+      action: () => startGame()
+    },
+    {
+      label: 'Settings',
+      icon: '⚙',
+      action: () => showSettings()
+    },
+    {
+      label: 'Quit',
+      icon: '✕',
+      action: () => quitGame()
+    }
+  ],
+  keyboardNavigation: true
+});
+
+menu.appendTo(document.body);
+menu.show();
+```
+
+### Using Layout Components
+
+```typescript
+import { VStack, HStack, Box, Text, Spacer } from '@curds/tangui';
+
+const container = new VStack({
+  padding: 4,
+  gap: 3,
+  backgroundColor: 'background'
+});
+
+const header = new HStack({
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  paddingX: 4,
+  paddingY: 2,
+  backgroundColor: 'surface'
+});
+
+const title = new Text({
+  children: 'My Game',
+  fontSize: 'xl',
+  fontWeight: 'bold'
+});
+
+const score = new Text({
+  children: 'Score: 1000',
+  color: 'primary'
+});
+
+header.appendChild(title);
+header.appendChild(new Spacer());
+header.appendChild(score);
+container.appendChild(header);
+```
+
 ## 📖 Documentation
 
-Full documentation and examples coming soon!
+See the `/examples` directory for complete working examples including game integration.
 
 ## 🤝 Contributing
 
