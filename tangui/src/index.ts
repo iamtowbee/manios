@@ -11,6 +11,12 @@ export * from './core';
 // Theme system
 export * from './themes';
 
+// Base UI components
+export * from './components';
+
+// Game-specific components
+export * from './game';
+
 // Version
 export const VERSION = '0.1.0';
 
