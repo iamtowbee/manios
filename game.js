@@ -1,3 +1,5 @@
+// Curds.io - Now powered by TanGui!
+
 // Game State
 const Game = {
     canvas: null,
@@ -33,96 +35,16 @@ const Game = {
     },
 
     npcs: [],
-    dialogue: null
+    dialogue: null,
+    dialogueBox: null,
+    hud: null
 };
 
-// Dialogue System
-class DialogueSystem {
-    constructor() {
-        this.active = false;
-        this.currentDialogue = null;
-        this.currentIndex = 0;
-        this.dialogueBox = document.getElementById('dialogue-box');
-        this.speakerName = document.getElementById('speaker-name');
-        this.dialogueText = document.getElementById('dialogue-text');
-        this.choicesContainer = document.getElementById('dialogue-choices');
-    }
-
-    start(dialogue) {
-        this.active = true;
-        this.currentDialogue = dialogue;
-        this.currentIndex = 0;
-        this.dialogueBox.classList.remove('dialogue-hidden');
-        this.showCurrentDialogue();
-    }
-
-    showCurrentDialogue() {
-        const current = this.currentDialogue.lines[this.currentIndex];
-        this.speakerName.textContent = current.speaker;
-        this.dialogueText.textContent = '';
-        this.choicesContainer.innerHTML = '';
-        this.choicesContainer.classList.remove('active');
-
-        // Type out text
-        this.typeText(current.text, () => {
-            if (current.choices) {
-                this.showChoices(current.choices);
-            }
-        });
-    }
-
-    typeText(text, callback) {
-        let i = 0;
-        const speed = 30;
-        const timer = setInterval(() => {
-            if (i < text.length) {
-                this.dialogueText.textContent += text.charAt(i);
-                i++;
-            } else {
-                clearInterval(timer);
-                if (callback) callback();
-            }
-        }, speed);
-    }
-
-    showChoices(choices) {
-        this.choicesContainer.classList.add('active');
-        choices.forEach((choice, index) => {
-            const btn = document.createElement('button');
-            btn.className = 'choice-btn';
-            btn.textContent = choice.text;
-            btn.onclick = () => this.handleChoice(choice);
-            this.choicesContainer.appendChild(btn);
-        });
-    }
-
-    handleChoice(choice) {
-        if (choice.response) {
-            this.currentDialogue.lines.push({
-                speaker: this.currentDialogue.lines[this.currentIndex].speaker,
-                text: choice.response
-            });
-            this.currentIndex++;
-            this.showCurrentDialogue();
-        } else {
-            this.next();
-        }
-    }
-
-    next() {
-        this.currentIndex++;
-        if (this.currentIndex < this.currentDialogue.lines.length) {
-            this.showCurrentDialogue();
-        } else {
-            this.end();
-        }
-    }
-
-    end() {
-        this.active = false;
-        this.currentDialogue = null;
-        this.currentIndex = 0;
-        this.dialogueBox.classList.add('dialogue-hidden');
+// Initialize TanGui on window load
+function initTanGui() {
+    // Initialize TanGui library
+    if (window.TanGui && window.TanGui.init) {
+        window.TanGui.init();
     }
 }
 
@@ -174,18 +96,44 @@ class NPC {
 
 // Initialize Game
 function init() {
+    // Initialize TanGui
+    initTanGui();
+
     Game.canvas = document.getElementById('game-canvas');
     Game.ctx = Game.canvas.getContext('2d');
     Game.canvas.width = Game.width;
     Game.canvas.height = Game.height;
-
-    Game.dialogue = new DialogueSystem();
 
     // Create world tiles
     createWorld();
 
     // Create NPCs
     createNPCs();
+
+    // Create TanGui DialogueBox (reusable instance)
+    if (window.TanGui) {
+        Game.dialogueBox = new window.TanGui.DialogueBox({
+            position: 'bottom',
+            typewriterSpeed: 30,
+            onComplete: () => {
+                Game.dialogue.active = false;
+            }
+        });
+        Game.dialogueBox.appendTo(document.body);
+
+        // Create TanGui HUD
+        Game.hud = new window.TanGui.HUD({
+            playerName: 'Explorer',
+            health: 100,
+            maxHealth: 100
+        });
+        Game.hud.appendTo(document.getElementById('ui-overlay'));
+    }
+
+    // Dialogue state tracker
+    Game.dialogue = {
+        active: false
+    };
 
     // Start button
     document.getElementById('start-btn').addEventListener('click', startGame);
@@ -196,9 +144,8 @@ function init() {
 
         if ((e.key === ' ' || e.key === 'Enter') && Game.dialogue.active) {
             e.preventDefault();
-            if (!Game.dialogue.choicesContainer.classList.contains('active')) {
-                Game.dialogue.next();
-            }
+            // TanGui DialogueBox handles its own advancement via built-in keyboard controls
+            return;
         }
 
         if ((e.key === ' ' || e.key === 'Enter') && !Game.dialogue.active) {
@@ -255,15 +202,21 @@ function createNPCs() {
                 choices: [
                     {
                         text: 'I\'m looking for adventure!',
-                        response: 'Ah, a brave soul! The Great Cheese Cave lies to the east. Many have entered, few have returned with the legendary Golden Curd!'
+                        action: () => {
+                            showDialogueResponse('Cheese Master', 'Ah, a brave soul! The Great Cheese Cave lies to the east. Many have entered, few have returned with the legendary Golden Curd!');
+                        }
                     },
                     {
                         text: 'Just exploring...',
-                        response: 'Take your time! Talk to the other villagers, they might have quests for you.'
+                        action: () => {
+                            showDialogueResponse('Cheese Master', 'Take your time! Talk to the other villagers, they might have quests for you.');
+                        }
                     },
                     {
                         text: 'Tell me about cheese.',
-                        response: 'Cheese is life! From mild cheddar to sharp gouda, we craft them all here. Each cheese has its own story and magic!'
+                        action: () => {
+                            showDialogueResponse('Cheese Master', 'Cheese is life! From mild cheddar to sharp gouda, we craft them all here. Each cheese has its own story and magic!');
+                        }
                     }
                 ]
             }
@@ -283,11 +236,15 @@ function createNPCs() {
                 choices: [
                     {
                         text: 'What happened to it?',
-                        response: 'It was stolen by the Mold King and hidden in the Great Cheese Cave. Only the pure of heart can retrieve it.'
+                        action: () => {
+                            showDialogueResponse('Elder Brie', 'It was stolen by the Mold King and hidden in the Great Cheese Cave. Only the pure of heart can retrieve it.');
+                        }
                     },
                     {
                         text: 'That sounds like a legend.',
-                        response: 'Perhaps... or perhaps it\'s waiting for someone brave enough to find out the truth!'
+                        action: () => {
+                            showDialogueResponse('Elder Brie', 'Perhaps... or perhaps it\'s waiting for someone brave enough to find out the truth!');
+                        }
                     }
                 ]
             }
@@ -307,11 +264,15 @@ function createNPCs() {
                 choices: [
                     {
                         text: 'Why is that?',
-                        response: 'Ever since the Mold King appeared, nobody wants to venture out anymore. It\'s killing my business!'
+                        action: () => {
+                            showDialogueResponse('Trader Tom', 'Ever since the Mold King appeared, nobody wants to venture out anymore. It\'s killing my business!');
+                        }
                     },
                     {
                         text: 'Cheer up!',
-                        response: 'Thanks, friend! Your optimism is refreshing. Come back when you\'ve found some treasures!'
+                        action: () => {
+                            showDialogueResponse('Trader Tom', 'Thanks, friend! Your optimism is refreshing. Come back when you\'ve found some treasures!');
+                        }
                     }
                 ]
             }
@@ -331,16 +292,31 @@ function createNPCs() {
                 choices: [
                     {
                         text: 'The one what?',
-                        response: 'The one who can end this curse. Find the three cheese fragments: Cheddar of Courage, Gouda of Wisdom, and Mozzarella of Heart.'
+                        action: () => {
+                            showDialogueResponse('Shadow', 'The one who can end this curse. Find the three cheese fragments: Cheddar of Courage, Gouda of Wisdom, and Mozzarella of Heart.');
+                        }
                     },
                     {
                         text: 'Who are you?',
-                        response: 'I am but a shadow of what once was. Help this land, and you\'ll understand everything.'
+                        action: () => {
+                            showDialogueResponse('Shadow', 'I am but a shadow of what once was. Help this land, and you\'ll understand everything.');
+                        }
                     }
                 ]
             }
         ]
     }));
+}
+
+// Helper function to show dialogue response
+function showDialogueResponse(speaker, text) {
+    if (Game.dialogueBox) {
+        Game.dialogueBox.setLines([{
+            speaker: speaker,
+            text: text
+        }]);
+        Game.dialogueBox.show();
+    }
 }
 
 function startGame() {
@@ -353,7 +329,11 @@ function startGame() {
 function checkNPCInteraction() {
     for (const npc of Game.npcs) {
         if (npc.isPlayerNearby(Game.player)) {
-            Game.dialogue.start(npc.dialogue);
+            if (Game.dialogueBox) {
+                Game.dialogue.active = true;
+                Game.dialogueBox.setLines(npc.dialogue.lines);
+                Game.dialogueBox.show();
+            }
             break;
         }
     }
@@ -465,7 +445,7 @@ function draw() {
 
     // Player face
     Game.ctx.fillStyle = '#fff';
-    ctx.fillRect(playerScreenX + 5, playerScreenY + 6, 5, 5);
+    Game.ctx.fillRect(playerScreenX + 5, playerScreenY + 6, 5, 5);
     Game.ctx.fillRect(playerScreenX + 14, playerScreenY + 6, 5, 5);
 
     Game.ctx.fillStyle = '#000';
